@@ -46,6 +46,17 @@ RUN composer install --no-dev --optimize-autoloader
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html/storage /var/www/html/bootstrap/cache
 
+COPY .devcontainer/settings.conf /etc/apache2/sites-available/
+
+RUN a2dissite 000-default.conf \
+    && rm /etc/apache2/sites-available/000-default.conf \
+    && a2ensite settings.conf \
+    && a2enmod rewrite headers expires
+    
+# Configurar permisos
+RUN chown -R $USERNAME:$USERNAME /var/www/html/API-Control-Hub
+    
+
 # Habilitar el módulo de reescritura de Apache
 RUN a2enmod rewrite
 
