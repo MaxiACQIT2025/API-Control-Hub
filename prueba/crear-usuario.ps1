@@ -2,18 +2,30 @@ param (
     [string]$JsonInput
 )
 
-# Establecer la codificación de salida en UTF-8
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# Deserializar el JSON recibido
-$datos = $JsonInput | ConvertFrom-Json
+# Eliminar comillas simples externas si existen
+if ($JsonInput.StartsWith("'") -and $JsonInput.EndsWith("'")) {
+    $JsonInput = $JsonInput.Trim("'")
+}
 
-Write-Host "Contenido deserializado del JSON:"
-Write-Host ($datos | ConvertTo-Json -Depth 2)
+# Mostrar el JSON recibido para depuración
+Write-Host "Contenido del JSON recibido:"
+Write-Host $JsonInput
+
+# Intentar deserializar el JSON
+try {
+    $datos = $JsonInput | ConvertFrom-Json
+    Write-Host "JSON deserializado correctamente:"
+    Write-Host ($datos | ConvertTo-Json -Depth 2)
+} catch {
+    Write-Host "Error al deserializar el JSON: $_"
+    return
+}
 
 # Validar y asignar valores con valores por defecto si son nulos
-$cn = if ($datos.cn) { $datos.cn } else { "Holi" }
-$sAMAccountName = if ($datos.sAMAccountName) { $datos.sAMAccountName } else { "Holi" }
+$cn = if ($datos.cn) { $datos.cn } else { "Pepe" }
+$sAMAccountName = if ($datos.sAMAccountName) { $datos.sAMAccountName } else { "Pepe" }
 $userPrincipalName = if ($datos.userPrincipalName) { $datos.userPrincipalName } else { "$sAMAccountName@acq.it" }
 $password = if ($datos.password) { $datos.password } else { "Password123!" }
 $distinguishedName = if ($datos.distinguishedName) { $datos.distinguishedName } else { "OU=OU_TEST,DC=ACQ,DC=IT" }
@@ -21,6 +33,9 @@ $mail = if ($datos.mail) { $datos.mail } else { "sincorreo@acq.it" }
 $department = if ($datos.department) { $datos.department } else { "Sin Departamento" }
 $title = if ($datos.title) { $datos.title } else { "Sin Título" }
 $userAccountControl = if ($datos.userAccountControl) { $datos.userAccountControl } else { 512 }
+$givenName = if ($datos.givenName) { $datos.givenName } else { "Nombre" }
+$sn = if ($datos.sn) { $datos.sn } else { "Apellido" }
+$displayName = if ($datos.displayName) { $datos.displayName } else { "$givenName $sn" }
 
 Write-Host "Datos ingresados:"
 Write-Host "Nombre completo (cn): $cn"
@@ -71,6 +86,4 @@ catch {
     }
     return $resultado
 }
-
-
 

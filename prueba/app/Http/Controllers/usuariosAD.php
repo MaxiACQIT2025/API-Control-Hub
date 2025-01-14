@@ -137,48 +137,6 @@ class usuariosAD extends Controller
         return response()->json(['output' => $output], 200);
     }
 
-
-    /**
-     * Ejecuta un script de PowerShell para realizar acciones en Active Directory.
-     */
-    public function manageUser(Request $request)
-    {
-        // Validar la entrada
-        $request->validate([
-            'action' => 'required|string|in:create,update,delete',
-            'username' => 'required|string',
-            'password' => 'nullable|string', // Solo requerido para 'create'
-            'ou' => 'nullable|string', // Requerido para 'create'
-        ]);
-
-        // Obtener los parámetros de la solicitud
-        $action = $request->input('action');
-        $username = $request->input('username');
-        $password = $request->input('password', '');
-        $ou = $request->input('ou', '');
-
-        // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\activedirectory.ps1';
-
-        // Comando para ejecutar el script de PowerShell
-        $command = "powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath -Action $action -Username $username";
-
-        // Agregar parámetros opcionales según la acción
-        if ($action === 'create') {
-            $command .= " -Password $password -OU $ou";
-        }
-
-        // Ejecutar el comando y capturar la salida
-        $output = shell_exec($command);
-
-        // Verificar si hubo un error
-        if (strpos($output, 'successfully') !== false) {
-            return response()->json(['message' => $output], 200);
-        }
-
-        return response()->json(['error' => 'Error executing PowerShell script', 'output' => $output], 500);
-    }
-
     public function createUser(Request $request)
     {
         // Validar los datos del formulario
@@ -197,19 +155,21 @@ class usuariosAD extends Controller
             'title' => 'nullable|string|max:50',
         ]);
 
-        // Generar el JSON desde el request
-        $jsonData = json_encode($request->all(), JSON_UNESCAPED_UNICODE);
+        // Generar JSON desde el request
+        $jsonData = json_encode($request->all(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
-        // Escapar el JSON para pasarlo como parámetro en línea de comandos
-        $escapedJsonData = escapeshellarg($jsonData);
+        // Escapar el JSON para pasarlo como argumento a PowerShell
+        $escapedJsonData = '"' . str_replace(['\\', '"'], ['\\\\', '\"'], $jsonData) . '"';
 
         // Ruta del script de PowerShell
         $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\crear-usuario.ps1';
 
-        // Construir el comando para ejecutar el script de PowerShell con el JSON como parámetro
+        // Construir el comando
         $command = "powershell -ExecutionPolicy Bypass -File \"$scriptPath\" -JsonInput $escapedJsonData";
 
-        // Ejecutar el script de PowerShell
+        //dd($command);
+
+        // Ejecutar el comando
         $output = shell_exec($command);
 
         // Verificar el resultado de la ejecución
@@ -225,6 +185,9 @@ class usuariosAD extends Controller
             ], 500);
         }
     }
+
+
+
 
     public function disableUser(Request $request, $user)
     {
@@ -257,6 +220,50 @@ class usuariosAD extends Controller
         }
     }
 
+    public function updateUser(Request $request, $sAMAccountName)
+    {
+        // Validar los datos del formulario
+        $request->validate([
+            'cn' => 'nullable|string|max:100',
+            'userPrincipalName' => 'nullable|email|max:100',
+            'givenName' => 'nullable|string|max:50',
+            'sn' => 'nullable|string|max:50',
+            'displayName' => 'nullable|string|max:100',
+            'mail' => 'nullable|email|max:100',
+            'department' => 'nullable|string|max:50',
+            'title' => 'nullable|string|max:50'
+        ]);
 
+        // Combinar el sAMAccountName de la URL con los datos del cuerpo de la solicitud
+        $requestData = array_merge($request->all(), ['sAMAccountName' => $sAMAccountName]);
+
+        // Generar JSON desde los datos combinados
+        $jsonData = json_encode($requestData, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+
+        // Escapar el JSON para pasarlo como argumento a PowerShell
+        $escapedJsonData = '"' . str_replace(['\\', '"'], ['\\\\', '\"'], $jsonData) . '"';
+
+        // Ruta del script de PowerShell
+        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\editar-usuario.ps1';
+
+        // Construir el comando
+        $command = "powershell -ExecutionPolicy Bypass -File \"$scriptPath\" -JsonInput $escapedJsonData";
+
+        // Ejecutar el comando
+        $output = shell_exec($command);
+
+        // Verificar el resultado de la ejecución
+        if ($output) {
+            return response()->json([
+                'message' => 'Usuario actualizado exitosamente',
+                'output' => $output
+            ]);
+        } else {
+            return response()->json([
+                'message' => 'Error al actualizar el usuario',
+                'output' => $output
+            ], 500);
+        }
+    }
 
 }

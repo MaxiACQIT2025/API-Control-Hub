@@ -23,12 +23,13 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 
 Route::get('/usersBase', [UsuariosBase::class, 'index']);
 
-Route::put('/ad/users/{user}', [UsuariosAD::class, 'disableUser']); // deshabilitar usuario
+Route::put('/ad/users/disable/{user}', [UsuariosAD::class, 'disableUser']); // deshabilitar usuario
 
 Route::post('/ad/users', [UsuariosAD::class, 'createUser']); // Alta
 
 Route::get('/ad/users', [UsuariosAD::class, 'listUsers']); // listar usuarios
 
+Route::put('/ad/users/edit/{sAMAccountName}', [UsuariosAD::class, 'updateUser']); // editar usuario
 
 //Route::put('/ad/users/{username}', [UsuariosAD::class, 'update']); // Modificación
 //Route::delete('/ad/users/{username}', [UsuariosAD::class, 'destroy']); // Baja

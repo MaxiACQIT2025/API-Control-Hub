@@ -13,8 +13,11 @@ try {
         throw "No se encontró ningún usuario con SamAccountName '$Identity' en OU=OU_TEST,DC=ACQ,DC=IT."
     }
 
+    Write-Host "Distinguished Name del usuario encontrado: $($usuario.DistinguishedName)" -ForegroundColor Yellow
+
+
     # Deshabilitar el usuario usando su Distinguished Name
-    Disable-ADAccount -Identity $usuario.DistinguishedName
+    Disable-ADAccount -Identity $usuario.DistinguishedName -ErrorAction Stop
 
     Write-Host "Usuario deshabilitado exitosamente." -ForegroundColor Green
 
