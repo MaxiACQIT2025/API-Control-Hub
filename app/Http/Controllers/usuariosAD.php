@@ -14,7 +14,7 @@ class usuariosAD extends Controller
     public function listUsers()
     {
         // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\listar-usuarios.ps1';
+        $scriptPath = '/home/producto/API-Control-Hub/listar-usuarios.ps1';
 
         // Comando para ejecutar el script de PowerShell
         $command = "powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath";
@@ -45,7 +45,7 @@ class usuariosAD extends Controller
     public function listGroups()
     {
         // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\listar-grupos.ps1';
+        $scriptPath = '/home/producto/API-Control-Hub/listar-grupos.ps1';
 
         // Comando para ejecutar el script de PowerShell
         $command = "powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath";
@@ -76,7 +76,7 @@ class usuariosAD extends Controller
     public function listOU()
     {
         // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\listar-ou.ps1';
+        $scriptPath = '/home/producto/API-Control-Hub/listar-grupos.ps1';
 
         // Comando para ejecutar el script de PowerShell
         $command = "powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath";
@@ -117,7 +117,7 @@ class usuariosAD extends Controller
         $samAccountName = $request->input('sam_account_name');
 
         // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\obtener-grupos-usuario.ps1';
+        $scriptPath = '/home/producto/API-Control-Hub/obtener-grupos-usuario.ps1';
 
         // Comando para ejecutar el script de PowerShell con el parámetro
         $command = "powershell -NoProfile -ExecutionPolicy Bypass -File $scriptPath -SamAccountName $samAccountName";
@@ -162,7 +162,7 @@ class usuariosAD extends Controller
         $escapedJsonData = '"' . str_replace(['\\', '"'], ['\\\\', '\"'], $jsonData) . '"';
 
         // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\crear-usuario.ps1';
+        $scriptPath = '/home/producto/API-Control-Hub/crear-usuario.ps1';
 
         // Construir el comando
         $command = "powershell -ExecutionPolicy Bypass -File \"$scriptPath\" -JsonInput $escapedJsonData";
@@ -198,7 +198,7 @@ class usuariosAD extends Controller
         $identity = $user;
 
         // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\deshabilitar-usuario.ps1';
+        $scriptPath = '/home/producto/API-Control-Hub/deshabilitar-usuario.ps1';
 
         // Construir el comando para ejecutar el script de PowerShell
         $command = "powershell -ExecutionPolicy Bypass -File \"$scriptPath\" -Identity $identity";
@@ -244,7 +244,7 @@ class usuariosAD extends Controller
         $escapedJsonData = '"' . str_replace(['\\', '"'], ['\\\\', '\"'], $jsonData) . '"';
 
         // Ruta del script de PowerShell
-        $scriptPath = 'C:\Users\maximiliano.gomez\Desktop\prueba-laravel\prueba\editar-usuario.ps1';
+        $scriptPath = '/home/producto/API-Control-Hub/editar-usuario.ps1';
 
         // Construir el comando
         $command = "powershell -ExecutionPolicy Bypass -File \"$scriptPath\" -JsonInput $escapedJsonData";
